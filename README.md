@@ -1,188 +1,92 @@
-[Hackernews Scraper](https://apify.com/cryptosignals/hackernews-scraper?fpr=data)
+[Hackernews Scraper](https://apify.com/sovereigntaylor/hackernews-scraper?fpr=data)
 
-# Hacker News Scraper: Stories, Comments & Users Free
+# Hacker News Scraper
 
-The most comprehensive **Hacker News scraper** on Apify. Extract HN stories, comments, and user profiles at scale. Search Hacker News posts by keyword. Export to JSON, CSV, or Excel. Built on the official HN Firebase API for maximum reliability.
-
-## Why Use This Hacker News Scraper?
-
-- **Tech Trend Analysis** - Track what's trending on Hacker News. Monitor emerging technologies, frameworks, and tools before they go mainstream.
-- **Startup Scouting** - Discover new startups from Show HN and Launch HN posts. Get early intelligence on companies before they hit the press.
-- **Hiring Intelligence** - Monitor "Who is Hiring" threads and job postings. Analyze which companies are hiring and for what roles.
-- **Competitive Research** - Track mentions of competitors, products, or technologies. See what the developer community thinks.
-- **Content Curation** - Build datasets of top-performing HN content. Understand what resonates with the tech community.
-- **Academic Research** - Analyze HN data for sentiment analysis, trend detection, and community dynamics research.
+Scrape Hacker News stories using the official Firebase API. Fetch top, new, best, ask, show, or job stories with scores, authors, and comments. No IP blocking — uses HN's public API.
 
 ## Features
 
-| Feature | Description |
-| --- | --- |
-| **6 Story Categories** | Top, New, Best, Ask HN, Show HN, Jobs |
-| **Full-Text Search** | Search HN posts via Algolia API |
-| **Comment Trees** | Fetch full comment threads for any story |
-| **User Profiles** | Get karma, about, and submission counts |
-| **Pagination** | Control output size with maxItems |
-| **Concurrent Fetching** | Fast parallel requests with rate limiting |
-| **Multiple Export Formats** | JSON, CSV, Excel, XML via Apify |
+- Scrape top, new, best, ask, show, and job stories
+- Uses official HN Firebase API (100% reliable, no blocking)
+- Extract titles, URLs, scores, authors, timestamps
+- Get comment counts and optionally fetch top comments
+- Lightning fast (2-5 seconds for 30 stories)
+- Configurable result limits (up to 500)
 
-## Input Configuration
+## Input
 
-| Parameter | Type | Default | Description |
+| Field | Type | Default | Description |
 | --- | --- | --- | --- |
-| `category` | string | `"top"` | Story category: `top`, `new`, `best`, `ask`, `show`, `jobs`, or `search` |
-| `searchQuery` | string | `""` | Search query (required when category is `search`) |
-| `maxItems` | integer | `100` | Maximum stories to return (1-500) |
-| `includeComments` | boolean | `false` | Fetch comment trees for each story |
-| `maxCommentsPerStory` | integer | `50` | Max comments per story |
-| `scrapeType` | string | `"stories"` | Output type: `stories`, `users`, or `both` |
+| mode | string | "top" | Story category: top, new, best, ask, show, jobs |
+| maxResults | number | 30 | Max stories to return (1-500) |
+| includeComments | boolean | false | Fetch top 5 comments per story |
 
-## Output - Stories
+## Output
 
 ```
 {
-  "id": 12345678,
-  "title": "Show HN: I built an AI-powered code reviewer",
-  "url": "https://example.com/project",
-  "text": null,
-  "author": "techfounder",
-  "score": 342,
-  "commentCount": 156,
-  "createdAt": "2025-12-15T10:30:00.000Z",
-  "storyType": "show",
-  "hnUrl": "https://news.ycombinator.com/item?id=12345678"
+  "rank": 1,
+  "title": "Show HN: I built an AI code editor",
+  "url": "https://example.com/ai-editor",
+  "score": 542,
+  "author": "developer123",
+  "commentCount": 187,
+  "time": "2026-03-01T10:30:00Z",
+  "type": "story",
+  "hnUrl": "https://news.ycombinator.com/item?id=12345"
 }
 ```
 
-## Output - Users
+## Use Cases
+
+- **Tech Trend Monitoring**: Track what developers are talking about
+- **Content Curation**: Find top-performing tech articles
+- **Competitive Intelligence**: Monitor mentions of products or companies
+- **Market Research**: Analyze developer sentiment and interests
+- **Data Analysis**: Build datasets of tech news over time
+
+## Pricing
+
+Pay per result — you only pay for what you scrape. See the Pricing tab for details.
+
+## Example
+
+Get top 50 stories with comments:
 
 ```
 {
-  "username": "techfounder",
-  "karma": 15420,
-  "about": "Building cool stuff. Previously at BigCorp.",
-  "createdAt": "2015-03-10T08:00:00.000Z",
-  "submittedCount": 892
+  "mode": "top",
+  "maxResults": 50,
+  "includeComments": true
 }
 ```
 
-## Output - Comments (when includeComments is true)
-
-```
-{
-  "id": 12345679,
-  "author": "commenter1",
-  "text": "This is a great project! I've been looking for something like this.",
-  "createdAt": "2025-12-15T11:00:00.000Z",
-  "parentId": 12345678
-}
-```
-
-## Example Use Cases
-
-### Get Top 50 HN Stories
-
-```
-{
-  "category": "top",
-  "maxItems": 50
-}
-```
-
-### Search for AI Startup Posts
-
-```
-{
-  "category": "search",
-  "searchQuery": "AI startup launch",
-  "maxItems": 100
-}
-```
-
-### Get Ask HN with Comments
-
-```
-{
-  "category": "ask",
-  "maxItems": 20,
-  "includeComments": true,
-  "maxCommentsPerStory": 100
-}
-```
-
-### Get Stories + Author Profiles
-
-```
-{
-  "category": "best",
-  "maxItems": 30,
-  "scrapeType": "both"
-}
-```
-
-## API Usage Examples
-
-### JavaScript
-
-```
-import { ApifyClient } from 'apify-client';
-
-const client = new ApifyClient({ token: 'YOUR_API_TOKEN' });
-const run = await client.actor('cryptosignals/hackernews-scraper').call({
-    category: 'top',
-    maxItems: 50,
-});
-const { items } = await client.dataset(run.defaultDatasetId).listItems();
-console.log(items);
-```
-
-### Python
+## Integration — Python
 
 ```
 from apify_client import ApifyClient
 
 client = ApifyClient("YOUR_API_TOKEN")
-run = client.actor("cryptosignals/hackernews-scraper").call(run_input={
-    "category": "top",
-    "maxItems": 50,
+run = client.actor("sovereigntaylor/hackernews-scraper").call(run_input={
+    "searchTerm": "hackernews",
+    "maxResults": 50
 })
-items = list(client.dataset(run["defaultDatasetId"]).iterate_items())
-print(items)
+
+for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+    print(f"{item.get('title', item.get('name', 'N/A'))}")
 ```
 
-### cURL
+## Integration — JavaScript
 
 ```
-curl "https://api.apify.com/v2/acts/cryptosignals~hackernews-scraper/runs" \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
-  -d '{"category": "top", "maxItems": 50}'
+import { ApifyClient } from 'apify-client';
+const client = new ApifyClient({ token: 'YOUR_API_TOKEN' });
+
+const run = await client.actor('sovereigntaylor/hackernews-scraper').call({
+    searchTerm: 'hackernews',
+    maxResults: 50
+});
+
+const { items } = await client.dataset(run.defaultDatasetId).listItems();
+items.forEach(item => console.log(item.title || item.name || 'N/A'));
 ```
-
-## About the Data Source
-
-This scraper uses the **official Hacker News Firebase API** ([https://github.com/HackerNews/API](https://github.com/HackerNews/API)) and the **Algolia HN Search API** for keyword search. These are public, free APIs provided by Y Combinator. No scraping of the website is involved -- all data comes from official endpoints, ensuring reliability and compliance.
-
-## FAQ
-
-**Q: Is this scraper free to use?**
-A: The actor itself is free. You only pay for Apify compute units based on your plan.
-
-**Q: How often is the data updated?**
-A: The HN API provides real-time data. Stories and scores are current at the time of scraping.
-
-**Q: Can I scrape historical data?**
-A: Use the search feature to find older posts by keyword. The Firebase API only provides current story lists.
-
-**Q: Why are some comments missing?**
-A: Deleted or dead (flagged) comments are filtered out automatically.
-
-**Q: What's the rate limit?**
-A: The official HN API has no documented rate limit. The scraper uses concurrent requests with sensible batching.
-
-**Q: Can I schedule this to run automatically?**
-A: Yes! Use Apify's scheduling feature to run the scraper hourly, daily, or on any custom schedule.
-
-## Tags
-
-hacker news, hn scraper, tech news, startup intelligence, developer tools, comment scraper, user profiles, tech trends, Y Combinator, hackernews api, hn data extraction
