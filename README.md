@@ -1,92 +1,76 @@
-[Hackernews Scraper](https://apify.com/sovereigntaylor/hackernews-scraper?fpr=data)
+[Hackernews Scraper](https://apify.com/skystone_labs/hackernews-scraper?fpr=data)
 
 # Hacker News Scraper
 
-Scrape Hacker News stories using the official Firebase API. Fetch top, new, best, ask, show, or job stories with scores, authors, and comments. No IP blocking — uses HN's public API.
+Extract stories, comments, and discussion data from [Hacker News](https://news.ycombinator.com). Pay only for successfully scraped items ($1 per 1,000 items).
 
 ## Features
 
-- Scrape top, new, best, ask, show, and job stories
-- Uses official HN Firebase API (100% reliable, no blocking)
-- Extract titles, URLs, scores, authors, timestamps
-- Get comment counts and optionally fetch top comments
-- Lightning fast (2-5 seconds for 30 stories)
-- Configurable result limits (up to 500)
-
-## Input
-
-| Field | Type | Default | Description |
-| --- | --- | --- | --- |
-| mode | string | "top" | Story category: top, new, best, ask, show, jobs |
-| maxResults | number | 30 | Max stories to return (1-500) |
-| includeComments | boolean | false | Fetch top 5 comments per story |
-
-## Output
-
-```
-{
-  "rank": 1,
-  "title": "Show HN: I built an AI code editor",
-  "url": "https://example.com/ai-editor",
-  "score": 542,
-  "author": "developer123",
-  "commentCount": 187,
-  "time": "2026-03-01T10:30:00Z",
-  "type": "story",
-  "hnUrl": "https://news.ycombinator.com/item?id=12345"
-}
-```
+- **Fast extraction** - Optimized for speed with lightweight page parsing
+- **Story data** - Titles, links, scores, authors, comment counts
+- **Comment extraction** - Optional full comment thread scraping
+- **Type detection** - Identifies stories, Ask HN, Show HN, and jobs
+- **Pagination** - Automatically follows "More" links for deeper scraping
 
 ## Use Cases
 
-- **Tech Trend Monitoring**: Track what developers are talking about
-- **Content Curation**: Find top-performing tech articles
-- **Competitive Intelligence**: Monitor mentions of products or companies
-- **Market Research**: Analyze developer sentiment and interests
-- **Data Analysis**: Build datasets of tech news over time
+- Tech trend analysis and monitoring
+- Content research for newsletters
+- Developer community sentiment analysis
+- Startup and launch tracking
+- Academic research on tech communities
 
-## Pricing
+## Input Parameters
 
-Pay per result — you only pay for what you scrape. See the Pricing tab for details.
+| Parameter | Type | Default | Description |
+| --- | --- | --- | --- |
+| `startUrls` | array | - | HN URLs to scrape (front page, new, ask, show, jobs) |
+| `maxResults` | integer | 100 | Maximum items to scrape (0 = unlimited) |
+| `extractComments` | boolean | false | Extract comment threads from stories |
+| `useCamoufox` | boolean | false | Enable anti-detect browser (not needed for HN) |
 
-## Example
-
-Get top 50 stories with comments:
+## Output Schema
 
 ```
 {
-  "mode": "top",
-  "maxResults": 50,
-  "includeComments": true
+  "url": "https://news.ycombinator.com/item?id=12345",
+  "title": "Show HN: My new open source project",
+  "link": "https://github.com/example/project",
+  "score": 234,
+  "author": "pg",
+  "commentCount": 89,
+  "age": "3 hours ago",
+  "rank": 1,
+  "type": "show",
+  "scrapedAt": "2024-01-15T10:30:00.000Z"
 }
 ```
 
-## Integration — Python
+## Pricing
+
+**$0.001 per successfully scraped item** ($1 per 1,000 items)
+
+No charges for failed requests.
+
+## Example Usage
 
 ```
-from apify_client import ApifyClient
-
-client = ApifyClient("YOUR_API_TOKEN")
-run = client.actor("sovereigntaylor/hackernews-scraper").call(run_input={
-    "searchTerm": "hackernews",
-    "maxResults": 50
-})
-
-for item in client.dataset(run["defaultDatasetId"]).iterate_items():
-    print(f"{item.get('title', item.get('name', 'N/A'))}")
+{
+  "startUrls": [
+    {"url": "https://news.ycombinator.com/"},
+    {"url": "https://news.ycombinator.com/newest"}
+  ],
+  "maxResults": 200,
+  "extractComments": false
+}
 ```
 
-## Integration — JavaScript
+## Limitations
 
-```
-import { ApifyClient } from 'apify-client';
-const client = new ApifyClient({ token: 'YOUR_API_TOKEN' });
+- HN may rate-limit very aggressive scraping
+- Comment extraction increases scraping time significantly
+- Very old stories may have limited data
 
-const run = await client.actor('sovereigntaylor/hackernews-scraper').call({
-    searchTerm: 'hackernews',
-    maxResults: 50
-});
+## Support
 
-const { items } = await client.dataset(run.defaultDatasetId).listItems();
-items.forEach(item => console.log(item.title || item.name || 'N/A'));
-```
+For issues or feature requests, please contact SkyStone Labs support.
